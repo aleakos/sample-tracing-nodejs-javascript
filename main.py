@@ -22,7 +22,7 @@ app = FastAPI()
 trace.set_tracer_provider(TracerProvider())
 
 # otlp_exporter = OTLPSpanExporter(endpoint="http://localhost:4317", insecure=True) # Use this for gRPC
-otlp_exporter = OTLPSpanExporter(endpoint="http://jaeger:4317", insecure=True) # Use this for gRPC
+otlp_exporter = OTLPSpanExporter(endpoint="http://localhost:4317", insecure=True) # Use this for gRPC
 
 service_name = os.environ.get('OTEL_SERVICE_NAME')
 print(f'service_name: {service_name}')
