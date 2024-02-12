@@ -31,7 +31,7 @@ app.get("/roll", async (req, res) => {
   span.setAttributes({ 'dice_roll': roll , 'trace_id': span.spanContext().traceId })
 
   // Call the FastAPI /roll-python endpoint
-  const pythonServiceURL = 'http://localhost:8084/roll-python'; // Adjust the port if necessary
+  const pythonServiceURL = 'http://fastapi:8084/roll-python'; // Adjust the port if necessary
   const traceHeaders = {};
   propagation.inject(context.active(), traceHeaders);
 
