@@ -10,6 +10,9 @@ const logger = require('./logger')
 
 const someTracer = trace.getTracer("SECOND-STEP-IN-THE-CHAIN");
 
+const serviceName = process.env.OTEL_SERVICE_NAME;
+console.log(`OTEL_SERVICE_NAME: ${serviceName}`);
+
 app.get("/", (req, res) => {
   // const span = context.active().span;
   setTimeout(() => {
@@ -24,7 +27,8 @@ app.get("/roll", async (req, res) => {
 
   // Simulate dice roll
   const roll = Math.floor(Math.random() * 6) + 1;
-  span.setAttributes({ 'dice_roll': roll });
+  // trace_id
+  span.setAttributes({ 'dice_roll': roll , 'trace_id': span.spanContext().traceId })
 
   // Call the FastAPI /roll-python endpoint
   const pythonServiceURL = 'http://localhost:8084/roll-python'; // Adjust the port if necessary

@@ -24,6 +24,9 @@ trace.set_tracer_provider(TracerProvider())
 # otlp_exporter = OTLPSpanExporter(endpoint="http://localhost:4317", insecure=True) # Use this for gRPC
 otlp_exporter = OTLPSpanExporter(endpoint="http://localhost:4317", insecure=True) # Use this for gRPC
 
+service_name = os.environ.get('OTEL_SERVICE_NAME')
+print(f'service_name: {service_name}')
+
 
 trace.get_tracer_provider().add_span_processor(
     BatchSpanProcessor(otlp_exporter)
@@ -45,34 +48,21 @@ async def roll_python():
     tracer = trace.get_tracer(service_name)
     with tracer.start_as_current_span("third-step-in-the-chain") as span:
 
-        # # Initialize Logs
-        # logger_provider = LoggerProvider(
-        #     resource=Resource.create(
-        #         {
-        #             'service.name': service_name,
-        #         }
-        #     ),
-        # )
-
-        # log_exporter = OTLPLogExporter(insecure=True)
-
-        # logger_provider.add_log_processor(BatchExportSpanProcessor(log_exporter))
-
-        # print("Rolling dice in Python")
-
         logger = logging.getLogger('main')
         logger.info(f'WHERE IS THIS PRINTIED')
-
-        #strinigy print span
 
 
     # Start a new span for this custom operation
         roll = randint(1, 6)  # Simulate rolling a dice
         # Add an event (log) to the span
-        span.add_event("Dice rolled", {"dice_value": str(roll)})
+        trace_id_hex = format(span.context.trace_id, '032x')
+        span.add_event("Dice rolled", {"dice_value": str(roll), "trace_id": trace_id_hex })
         # Set an attribute on the span
         span.set_attribute("dice_roll", roll)
+        span.set_attribute("trace_id", trace_id_hex)
         # throw an error
+
+        print("span", span)
 
         if roll != 1:
             span.set_attribute("is_lucky", True)

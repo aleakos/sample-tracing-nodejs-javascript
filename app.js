@@ -11,6 +11,8 @@ const http = require('http');
 const databaseTracer = trace.getTracer("database-operations");
 const rollChainTracer = trace.getTracer("roll-some-friggin-chain");
 
+const serviceName = process.env.OTEL_SERVICE_NAME;
+console.log(`OTEL_SERVICE_NAME: ${serviceName}`);
 
 app.get("/", (req, res) => {
   // const span = context.active().span;
@@ -29,9 +31,7 @@ app.get("/roll", (req, res) => {
   span.addEvent("Rolling a dice");
   const roll = Math.floor(Math.random() * 6) + 1;
   logger.info('Rolling a dice 2')
-  span.setAttributes({
-    'something': 'value'
-  })
+  span.setAttributes({ 'trace_id': span.spanContext().traceId })
   span.end();
   console.log(span)
   res.send(`You rolled a ${roll}`);
@@ -42,6 +42,7 @@ app.get("/roll-chain", (req, res) => {
 
   // const span = trace.getSpan(context.active());
   const span = rollChainTracer.startSpan("roll-chain-tracer");
+  span.setAttributes({ 'trace_id': span.spanContext().traceId })
   span.addEvent("roll-chain begins");
 
   logger.info('roll-chain')
